@@ -5,14 +5,15 @@ import login from '../images/login.svg';
 import register from '../images/register.svg';
 import 'font-awesome/css/font-awesome.min.css';
 import { NavLink, useHistory } from 'react-router-dom';
+import { connect } from 'react-redux';
+
 import  {UserContext} from '../../App';
 import { useAlert } from 'react-alert';
-
-
+import  {signUp} from "../../actions/authAction"
 // import {RiLockPasswordFill} from 'react-icons/ri';
 
 
-const Signup = () => {
+const Signup = (props) => {
   const alert = useAlert();
 
 const {state, dispatch} = useContext(UserContext);
@@ -28,7 +29,7 @@ const {state, dispatch} = useContext(UserContext);
   let name, value;
 
   const handleInputs = (e) => {
-    console.log(e);
+    // console.log(e);
     name = e.target.name;
     value = e.target.value;
 
@@ -37,34 +38,36 @@ const {state, dispatch} = useContext(UserContext);
 
   const PostData = async (e) => {
     e.preventDefault();
+    const {signUp} = props;
+    await signUp(user).then(() => {
+      history.push('/');
+    })
 
-    const { name, email, phone, password, cpassword } = user;
+//     const res = await fetch("/register", {
+//       method: "POST",
+//       headers: {
+//         "Content-type": "application/json"
+//       },
+//       body: JSON.stringify({
+//         name, email, phone, password, cpassword
+//       })
 
-    const res = await fetch("/register", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: JSON.stringify({
-        name, email, phone, password, cpassword
-      })
+//     });
 
-    });
+//     const data = await res.json();
+// console.log(data);
+//     if (res.status === 400 || !data) {
+//       // window.alert("Invalid Regestration");
+//       alert.error(data.error);
+//       console.log(data);
+//     } else {
+//       // window.alert("Regestration Successful");
+//       alert.success("Regestration Successful");
 
-    const data = await res.json();
-console.log(data);
-    if (res.status === 400 || !data) {
-      // window.alert("Invalid Regestration");
-      alert.error(data.error);
-      console.log(data);
-    } else {
-      // window.alert("Regestration Successful");
-      alert.success("Regestration Successful");
+//       console.log("Regestration Successful");
 
-      console.log("Regestration Successful");
-
-      setFlag(!flag);
-    }
+//       setFlag(!flag);
+//     }
 
 
 
@@ -260,4 +263,12 @@ const loginUser =async (e) =>{
   );
 };
 
-export default Signup;
+const mapDispatchToProp = (dispatch) =>({
+  signUp: (userDetail) => dispatch(signUp(userDetail))
+})
+
+const mapStateToProp = (state) => ({
+  currentUser: state.auth.user
+})
+
+export default connect(mapStateToProp, mapDispatchToProp)(Signup);
